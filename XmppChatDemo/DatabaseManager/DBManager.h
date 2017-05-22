@@ -37,6 +37,8 @@
 
 - (NSArray*)getChatHistoryData:(NSString*)tableName;
 
+- (NSArray*)getGroupChatHistoryWithChatId:(NSString*)chat_id;
+
 - (NSArray*)getChatHistoryData:(NSString*)tableName fromUser:(NSString*)fromUser toUser:(NSString*)toUser;
 
 -(void)insertAndUpdateDialogHistoryWithArrayUsingTrasaction:(NSArray*)arr;

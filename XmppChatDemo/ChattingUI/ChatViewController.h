@@ -30,7 +30,9 @@
 @property (strong, nonatomic) UIImage* senderImage;
 @property (strong, nonatomic) UIImage* receiverImage;
 
-
+// Group chat
+@property(nonatomic,assign) BOOL isGroupChat;
+@property(nonatomic,strong) NSString *chat_id;
 
 
 @end

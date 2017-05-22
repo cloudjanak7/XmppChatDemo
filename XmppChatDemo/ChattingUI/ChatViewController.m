@@ -8,14 +8,10 @@
 
 #import "ChatViewController.h"
 //#import "Constant.h"
-#import "XMPP.h"
-#import "NSString+Utils.h"
-#import "AppDelegate.h"
 #import "PhotoMediaItem.h"
 #import "VideoMediaItem.h"
 #import "IDMPhotoBrowser.h"
 #import "ChatHistory.h"
-#import "DBManager.h"
 #import "DialogHistory.h"
 #import "XmppChatDemo-Swift.h"
 //#import "AGEmojiKeyBoardView.h"
@@ -38,8 +34,6 @@
  
         BOOL isLoading;
         BOOL initialized;
-        
-        NSString *groupId;
         
         NSMutableArray *users;
         NSMutableArray *messages;
@@ -68,13 +62,6 @@
 
 #pragma mark - App Delegate Custom Methods
 
-- (AppDelegate *)appDelegate {
-        return (AppDelegate *)[[UIApplication sharedApplication] delegate];
-}
-
-- (XMPPStream *)xmppStream {
-        return [[self appDelegate] xmppStream];
-}
 
 #pragma mark - View controller
 
@@ -128,7 +115,7 @@
         initialized = NO;
         //[self loadMessages];
         
-        AppDelegate *del = [self appDelegate];
+        XMPPManager *del = [XMPPManager sharedManager];
         del._messageDelegate = self;
     
         
@@ -258,7 +245,17 @@
                 messages = [[NSMutableArray alloc] init];
             
             DBManager *db=[[DBManager alloc]initWithDB:DATABASE_NAME];
-            NSArray *arrayMessageHistory=[db getChatHistoryData:TABLE_NAME_CHAT_HISTORY fromUser:userID toUser:chatWithUser];
+            NSArray *arrayMessageHistory;
+            
+            if (_isGroupChat){
+            
+                NSString *strUserId = [self getNickNameFromUserName:chatWithUser];
+                arrayMessageHistory=[db getGroupChatHistoryWithChatId:strUserId];
+            }else{
+            
+                arrayMessageHistory=[db getChatHistoryData:TABLE_NAME_CHAT_HISTORY fromUser:userID toUser:chatWithUser];
+            }
+            
   
                 for (ChatHistory* msg in arrayMessageHistory) {
                         NSMutableDictionary* data=[NSMutableDictionary dictionary];
@@ -853,7 +850,7 @@
                 [message addAttributeWithName:@"to" stringValue:chatWithUser];
                 [message addChild:body];
                 
-                [[self xmppStream] sendElement:message];
+                [[XMPPManager sharedManager].xmppStream sendElement:message];
                 
                 // self.messageField.text = @"";
                 
@@ -939,16 +936,33 @@
                 [body setStringValue:messageStr];
                 
                 NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
-                [message addAttributeWithName:@"type" stringValue:@"chat"];
+            
                // [message addAttributeWithName:@"to" stringValue:@"sandeep@localhost"];
-                [message addAttributeWithName:@"to" stringValue:chatWithUser];
-                [message addChild:body];
-                
                 //Send message to receiver
-                [[self xmppStream] sendElement:message];
-                
-               // self.messageField.text = @"";
-                
+                if (_isGroupChat){
+                    
+                     NSString *jabberID = [[NSUserDefaults standardUserDefaults] stringForKey:@"userID"];
+                    NSString *strGroupName=[self getNickNameFromUserName:chatWithUser];
+                    XMPPMessage *xMessage = [[XMPPMessage alloc] init];
+                    [xMessage addAttributeWithName:@"senderId" stringValue:jabberID];
+                    [xMessage addAttributeWithName:@"displayName" stringValue:jabberID];
+                    NSString *dateTimeInterval = [NSString stringWithFormat:@"%f",[[NSDate date] timeIntervalSince1970]];
+                    [xMessage addAttributeWithName:@"date" stringValue:dateTimeInterval];
+                    
+                    [xMessage addBody:messageStr];
+                    
+                    [[XMPPManager sharedManager].xmppRoom sendMessage:xMessage];
+                }
+                else{
+                    [message addAttributeWithName:@"to" stringValue:chatWithUser];
+                    [message addAttributeWithName:@"type" stringValue:@"chat"];
+                    [message addChild:body];
+                    
+                    [[XMPPManager sharedManager].xmppStream sendElement:message];
+
+                }
+            
+            
                 //-------------------------------------------------------------------
                 NSDate*date=[NSString getCurrentDateFromString:[NSString getCurrentTime]];
                 
@@ -967,14 +981,20 @@
                 //===========SAVING IN DATABASE =================//
                 NSString *sender = [[NSUserDefaults standardUserDefaults]objectForKey:@"userID"];
                 ChatHistory *chat=[[ChatHistory alloc] init];
-                chat.chat_id=@"0";
-                chat.from_username=sender;
-                chat.to_username=chatWithUser;
-                chat.chat_message=messageStr;
-                chat.chat_timestamp=time;
-                NSArray *ar=[[NSArray alloc]initWithObjects:chat, nil];
-                DBManager *objDB=[[DBManager alloc]initWithDB:DATABASE_NAME];
-                [objDB insertAndUpdateChatWithArrayUsingTrasaction:ar];
+            
+                if (_isGroupChat){
+                    NSString *strGroupName = [self getNickNameFromUserName:chatWithUser];
+                     chat.chat_id=strGroupName;
+                }else{
+                    chat.chat_id=@"0";
+                }
+                    chat.from_username=sender;
+                    chat.to_username=chatWithUser;
+                    chat.chat_message=messageStr;
+                    chat.chat_timestamp=time;
+                    NSArray *ar=[[NSArray alloc]initWithObjects:chat, nil];
+                    DBManager *objDB=[[DBManager alloc]initWithDB:DATABASE_NAME];
+                    [objDB insertAndUpdateChatWithArrayUsingTrasaction:ar];
             
             
                 //Save data for Dialog History

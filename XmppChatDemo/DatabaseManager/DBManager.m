@@ -240,6 +240,74 @@
     return retval;
 }
 
+#pragma mark - Get Chat history Records
+- (NSArray*)getGroupChatHistoryWithChatId:(NSString*)chat_id{
+    
+    
+    NSMutableArray *retval = [[NSMutableArray alloc] init]; //
+       NSString *query = [NSString stringWithFormat:@"SELECT id,chat_id,from_username,to_username,chat_message,chat_timestamp FROM CHAT_HISTORY WHERE chat_id = '%@'",chat_id];
+    const char* queryUTF8 = [query UTF8String];
+    sqlite3_stmt *statement;
+    
+    @autoreleasepool {
+        int response = sqlite3_prepare_v2(_database, queryUTF8, -1, &statement, nil);
+        if (response == SQLITE_OK) {
+            while (sqlite3_step(statement) == SQLITE_ROW) {
+                // int uniqueId = sqlite3_column_int(statement, 0);
+                ChatHistory * jobs=[[ChatHistory alloc]init];
+                
+                if ( sqlite3_column_type(statement, 0) != SQLITE_NULL ){
+                    char *nameChars = (char *) sqlite3_column_text(statement, 0);
+                    jobs.database_id = [[NSString alloc] initWithUTF8String:nameChars];
+                }
+                else
+                    jobs.database_id = @"NULL";
+                
+                if ( sqlite3_column_type(statement, 1) != SQLITE_NULL ){
+                    char *nameChars = (char *) sqlite3_column_text(statement, 1);
+                    jobs.chat_id = [[NSString alloc] initWithUTF8String:nameChars];
+                }
+                else
+                    jobs.chat_id = @"NULL";
+                
+                if ( sqlite3_column_type(statement, 2) != SQLITE_NULL ){
+                    char *nameChars = (char *) sqlite3_column_text(statement, 2);
+                    jobs.from_username = [[NSString alloc] initWithUTF8String:nameChars];
+                }
+                else
+                    jobs.from_username = @"NULL";
+                
+                if ( sqlite3_column_type(statement, 3) != SQLITE_NULL ){
+                    char *nameChars = (char *) sqlite3_column_text(statement, 3);
+                    jobs.to_username = [[NSString alloc] initWithUTF8String:nameChars];
+                }
+                else
+                    jobs.to_username = @"NULL";
+                
+                if ( sqlite3_column_type(statement, 4) != SQLITE_NULL ){
+                    char *nameChars = (char *) sqlite3_column_text(statement, 4);
+                    jobs.chat_message = [[NSString alloc] initWithUTF8String:nameChars];
+                }
+                else
+                    jobs.chat_message = @"NULL";
+                
+                if ( sqlite3_column_type(statement, 5) != SQLITE_NULL ){
+                    char *nameChars = (char *) sqlite3_column_text(statement, 5);
+                    jobs.chat_timestamp = [[NSString alloc] initWithUTF8String:nameChars];
+                }
+                else
+                    jobs.chat_timestamp = @"NULL";
+                
+                
+                [retval addObject:jobs];
+            }
+            sqlite3_finalize(statement);
+        }
+    }
+    return retval;
+}
+
+
 - (NSArray*)getChatHistoryData:(NSString*)tableName fromUser:(NSString*)fromUser toUser:(NSString*)toUser{
   
     NSMutableArray *retval = [[NSMutableArray alloc] init]; //
@@ -318,7 +386,7 @@
         
         
         const char *queryInsertAndUpdate =
-        "INSERT OR REPLACE INTO DIALOG_HISTORY (                                                                                                                                                                                                                   dialog_id,                                                                                                                            last_message,                                                                                                                                 last_username,                                                                                                                                  last_message_date,                                                                                                                                   created_date,                                                                                                        unread_count)                                                                                                                                       VALUES(?,?,?,?,?,?)";
+        "INSERT OR REPLACE INTO DIALOG_HISTORY (                                                                                                                                                                                                                   dialog_id,                                                                                                                            last_message,                                                                                                                                 last_username,                                                                                                                                  last_message_date,                                                                                                                                   created_date,                                                                                                        unread_count,                                                                                                        chat_id)                                                                                                                                       VALUES(?,?,?,?,?,?,?)";
         
         const char *queryDelete = "delete from DIALOG_HISTORY where dialog_id=?";
         
@@ -349,6 +417,7 @@
                     sqlite3_bind_text(compiledStatement1, 4, [dialogHistory.last_message_date UTF8String], -1, SQLITE_STATIC);
                     sqlite3_bind_text(compiledStatement1, 5, [dialogHistory.created_date UTF8String], -1, SQLITE_STATIC);
                     sqlite3_bind_int (compiledStatement1, 6, dialogHistory.unread_count);
+                     sqlite3_bind_text(compiledStatement1, 7, [dialogHistory.chat_id UTF8String], -1, SQLITE_STATIC);
                     
                     if (sqlite3_step(compiledStatement1) != SQLITE_DONE)
                         NSLog(@"Values not inserted. Error: %s",sqlite3_errmsg(_database));
@@ -436,6 +505,13 @@
                 else
                     dh.unread_count=0;
                 
+                if ( sqlite3_column_type(statement, 6) != SQLITE_NULL ){
+                    char *nameChars = (char *) sqlite3_column_text(statement, 6);
+                    dh.chat_id = [[NSString alloc] initWithUTF8String:nameChars];
+                }
+                else
+                    dh.chat_id=@"NULL";
+                
         
                 
                 [retval addObject:dh];
@@ -445,6 +521,87 @@
     }
     return retval;
 }
+
+//- (NSArray*)GetDialogHistoryData{
+//    
+//    NSMutableArray *retval = [[NSMutableArray alloc] init]; //
+//    NSString *query = [NSString stringWithFormat:@"SELECT id,dialog_id,last_message,last_username,last_message_date,created_date,unread_count,chat_id FROM DIALOG_HISTORY"];
+//    const char* queryUTF8 = [query UTF8String];
+//    sqlite3_stmt *statement;
+//    
+//    @autoreleasepool {
+//        int response = sqlite3_prepare_v2(_database, queryUTF8, -1, &statement, nil);
+//        if (response == SQLITE_OK) {
+//            while (sqlite3_step(statement) == SQLITE_ROW) {
+//                // int uniqueId = sqlite3_column_int(statement, 0);
+//                DialogHistory * jobs=[[DialogHistory alloc]init];
+//                
+//                if ( sqlite3_column_type(statement, 0) != SQLITE_NULL ){
+//                    char *nameChars = (char *) sqlite3_column_text(statement, 0);
+//                    jobs.Id = [[NSString alloc] initWithUTF8String:nameChars];
+//                }
+//                else
+//                    jobs.Id = @"NULL";
+//                
+//                if ( sqlite3_column_type(statement, 1) != SQLITE_NULL ){
+//                    char *nameChars = (char *) sqlite3_column_text(statement, 1);
+//                    jobs.dialog_id = [[NSString alloc] initWithUTF8String:nameChars];
+//                }
+//                else
+//                    jobs.dialog_id = @"NULL";
+//                
+//                if ( sqlite3_column_type(statement, 2) != SQLITE_NULL ){
+//                    char *nameChars = (char *) sqlite3_column_text(statement, 2);
+//                    jobs.last_message = [[NSString alloc] initWithUTF8String:nameChars];
+//                }
+//                else
+//                    jobs.last_message = @"NULL";
+//                
+//                if ( sqlite3_column_type(statement, 3) != SQLITE_NULL ){
+//                    char *nameChars = (char *) sqlite3_column_text(statement, 3);
+//                    jobs.last_username = [[NSString alloc] initWithUTF8String:nameChars];
+//                }
+//                else
+//                    jobs.last_username = @"NULL";
+//                
+//                if ( sqlite3_column_type(statement, 4) != SQLITE_NULL ){
+//                    char *nameChars = (char *) sqlite3_column_text(statement, 4);
+//                    jobs.last_message_date = [[NSString alloc] initWithUTF8String:nameChars];
+//                }
+//                else
+//                    jobs.last_message_date = @"NULL";
+//                
+//                if ( sqlite3_column_type(statement, 5) != SQLITE_NULL ){
+//                    char *nameChars = (char *) sqlite3_column_text(statement, 5);
+//                    jobs.created_date = [[NSString alloc] initWithUTF8String:nameChars];
+//                }
+//                else
+//                    jobs.created_date = @"NULL";
+//                
+//                if ( sqlite3_column_type(statement, 6) != SQLITE_NULL ){
+//                   // char *nameChars = (char *) sqlite3_column_int(statement, 6);
+//                    jobs.unread_count = sqlite3_column_int(statement, 6);
+//                }
+//                else
+//                    jobs.unread_count = 0;
+//                
+//                if ( sqlite3_column_type(statement, 7) != SQLITE_NULL ){
+//                    char *nameChars = (char *) sqlite3_column_text(statement, 7);
+//                    jobs.chat_id = [[NSString alloc] initWithUTF8String:nameChars];
+//                }
+//                else
+//                    jobs.chat_id = @"NULL";
+//                
+//                
+//                [retval addObject:jobs];
+//            }
+//            sqlite3_finalize(statement);
+//        }
+//    }
+//    return retval;
+//    
+//}
+
 
 
 #pragma mark - Delete a rerod from DB Table

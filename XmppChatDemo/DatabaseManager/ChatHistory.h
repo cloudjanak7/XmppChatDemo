@@ -11,11 +11,14 @@
 @interface ChatHistory : NSObject
 
 @property (nonatomic, retain) NSString *database_id;
-@property (nonatomic, retain) NSString *chat_id;
 @property (nonatomic, retain) NSString *from_username;
 @property (nonatomic, retain) NSString *to_username;
 @property (nonatomic, retain) NSString *chat_message;
 @property (nonatomic, retain) NSString *chat_timestamp;
 
+
+// Group chat
+// 0 in case of single chat
+@property (nonatomic, retain) NSString *chat_id;
 
 @end

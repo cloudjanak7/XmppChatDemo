@@ -18,4 +18,7 @@
 @property (nonatomic, retain) NSString *created_date;
 @property int unread_count;
 
+// Group chat
+@property (nonatomic, retain) NSString *chat_id;
+
 @end
