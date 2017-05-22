@@ -1,0 +1,21 @@
+//
+//  XmppChatDemo-PrefixHeader.pch
+//  XmppChatDemo
+//
+//  Created by Infoicon on 22/05/17.
+//  Copyright © 2017 InfoiconTechnologies. All rights reserved.
+//
+
+#ifndef XmppChatDemo_PrefixHeader_pch
+#define XmppChatDemo_PrefixHeader_pch
+
+#import "DBManager.h"
+#import "Alert.h"
+#import "NSString+Utils.h"
+#import "Constant.h"
+#import "DialogHistory.h"
+#import "AppDelegate.h"
+#import "XMPPManager.h"
+#define Appdelegate ((AppDelegate *)[[UIApplication sharedApplication] delegate])
+
+#endif /* XmppChatDemo_PrefixHeader_pch */
