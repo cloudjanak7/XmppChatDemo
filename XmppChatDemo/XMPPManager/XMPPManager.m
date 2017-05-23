@@ -226,7 +226,7 @@
         [m setObject:to forKey:@"receiver"];
         [m setObject:roomId forKey:@"roomId"];
         
-        [__messageDelegate newMessageReceived:m];
+        //[__messageDelegate newMessageReceived:m];
         
         
         //Save Dialog History in Database
@@ -258,7 +258,7 @@
         
         //===========SAVING IN DATABASE =================//
         
-       NSString *timeStamp = [[message elementForName:@"stamp"] stringValue];
+         NSString *timeStamp = [[message elementForName:@"stamp"] stringValue];
         
         ChatHistory *chat=[[ChatHistory alloc] init];
         chat.message_id=roomId;
@@ -266,14 +266,16 @@
         chat.from_username=from;
         chat.to_username=to;
         chat.chat_message=msg;
-        chat.chat_timestamp=timeStamp;
+        chat.chat_timestamp=time;
+        chat.message_stamp = timeStamp;
+        
         NSArray *ar=[[NSArray alloc]initWithObjects:chat, nil];
         DBManager *objDB=[[DBManager alloc]initWithDB:DATABASE_NAME];
         [objDB insertAndUpdateChatWithArrayUsingTrasaction:ar];
         
         
         //Update Chat View
-       // [[NSNotificationCenter defaultCenter] postNotificationName:@"OnIncomingMessageUpdateDialogHistory" object:nil userInfo:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"OnIncomingMessageUpdateDialogHistory" object:nil userInfo:nil];
     }
 }
 

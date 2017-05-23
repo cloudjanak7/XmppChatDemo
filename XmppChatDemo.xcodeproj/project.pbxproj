@@ -1036,7 +1036,7 @@
 				TargetAttributes = {
 					D5D215961EC1A490000C43AE = {
 						CreatedOnToolsVersion = 8.3.2;
-						DevelopmentTeam = KJM3V4YN84;
+						DevelopmentTeam = 67663LKV4Z;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -1366,9 +1366,9 @@
 			baseConfigurationReference = 0708FD98FA386AE1E92D6131 /* Pods-XmppChatDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = KJM3V4YN84;
+				DEVELOPMENT_TEAM = 67663LKV4Z;
 				ENABLE_BITCODE = NO;
-				GCC_PREFIX_HEADER = "/InfoiconProjects/Arvind_Project/Other/XmppGroupChat/XmppChatDemo/XmppChatDemo/XmppChatDemo-PrefixHeader.pch";
+				GCC_PREFIX_HEADER = "/Arvind Project/Other/ChatXmpp_Demo/XmppChatDemo/XmppChatDemo/XmppChatDemo-PrefixHeader.pch";
 				HEADER_SEARCH_PATHS = $SDKROOT/usr/include/libxml2;
 				INFOPLIST_FILE = XmppChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -1389,9 +1389,9 @@
 			baseConfigurationReference = FDB634087CEE8B6BE1EC93BB /* Pods-XmppChatDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = KJM3V4YN84;
+				DEVELOPMENT_TEAM = 67663LKV4Z;
 				ENABLE_BITCODE = NO;
-				GCC_PREFIX_HEADER = "/InfoiconProjects/Arvind_Project/Other/XmppGroupChat/XmppChatDemo/XmppChatDemo/XmppChatDemo-PrefixHeader.pch";
+				GCC_PREFIX_HEADER = "/Arvind Project/Other/ChatXmpp_Demo/XmppChatDemo/XmppChatDemo/XmppChatDemo-PrefixHeader.pch";
 				HEADER_SEARCH_PATHS = $SDKROOT/usr/include/libxml2;
 				INFOPLIST_FILE = XmppChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;

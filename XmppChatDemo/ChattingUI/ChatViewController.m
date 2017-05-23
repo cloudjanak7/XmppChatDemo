@@ -691,17 +691,19 @@
         if ([[notification name] isEqualToString:@"OnIncomingMessageUpdateDialogHistory"]){
                 //                NSLog (@"Successfully received the test notification!");
                 dispatch_async(dispatch_get_main_queue(), ^{
-                        
-                        NSString *sender = [info objectForKey:@"sender"];
-                        NSString *m = [info objectForKey:@"msg"];
-                        
-                        if([sender isEqualToString:chatWithUser]){
-                        
-                                //Update Dialog history
-                                [self saveDialogHistoryWithMessage:m];
-                                
-                        }
-                        
+                    
+                    [self loadMessageHistoryData];
+                    
+//                        NSString *sender = [info objectForKey:@"sender"];
+//                        NSString *m = [info objectForKey:@"msg"];
+//                        
+//                        if([sender isEqualToString:chatWithUser]){
+//                        
+//                                //Update Dialog history
+//                                [self saveDialogHistoryWithMessage:m];
+//                                
+//                        }
+                    
                 });
         }
         
@@ -963,7 +965,9 @@
        // [self sendMessage:text Video:nil Picture:nil];
         
         NSString *messageStr = text;
-        
+    
+      NSString *dateTimeInterval = [NSString stringWithFormat:@"%f",[[NSDate date] timeIntervalSince1970]];
+    
         if([messageStr length] > 0) {
 
                 //-------------------------------------------------------------------
@@ -986,7 +990,7 @@
                     // [message addAttributeWithName:@"from" stringValue:[self getFullRoomId]];
                     
                   //  [xMessage addAttributeWithName:@"displayName" stringValue:jabberID];
-                    NSString *dateTimeInterval = [NSString stringWithFormat:@"%f",[[NSDate date] timeIntervalSince1970]];
+                   
                     [xMessage addAttributeWithName:@"stamp" stringValue:dateTimeInterval];
                     
                   //  NSXMLElement *history = [NSXMLElement elementWithName:@"history"];
@@ -1040,6 +1044,7 @@
                     chat.to_username=chatWithUser;
                     chat.chat_message=messageStr;
                     chat.chat_timestamp=time;
+                    chat.message_stamp=dateTimeInterval;
             
                     NSArray *ar=[[NSArray alloc]initWithObjects:chat, nil];
                     DBManager *objDB=[[DBManager alloc]initWithDB:DATABASE_NAME];

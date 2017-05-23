@@ -115,7 +115,7 @@
     
     if(arr.count){
         const char *queryInsertAndUpdate =
-        "INSERT OR REPLACE INTO CHAT_HISTORY         (chat_id,from_username,to_username,chat_message,chat_timestamp,message_stamp)VALUES(?,?,?,?,?)";
+        "INSERT OR REPLACE INTO CHAT_HISTORY         (chat_id,from_username,to_username,chat_message,chat_timestamp,message_stamp)VALUES(?,?,?,?,?,?)";
         const char *queryDelete = "delete from CHAT_HISTORY where chat_id=?";
         sqlite3_stmt *compiledStatement1 = nil;
         sqlite3_stmt *compiledStatement2 = nil;
