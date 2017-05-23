@@ -101,7 +101,7 @@
     NSError *error;
     
     NSString *myPassword = [[NSUserDefaults standardUserDefaults] stringForKey:@"userPassword"];
-    if(![[self xmppStream] authenticateWithPassword:@"infoiconuser5" error:&error])
+    if(![[self xmppStream] authenticateWithPassword:myPassword error:&error])
         NSLog(@"Error authenticating: %@", error);
 //    if (![self.xmppStream authenticateAnonymously:&error]) {
 //         NSLog(@"Error: %@", [error localizedDescription]);
@@ -165,6 +165,7 @@
     [self.xmppReconnect activate:self.xmppStream];
     [self.xmppReconnect addDelegate:self delegateQueue:dispatch_get_main_queue()];
     [self goOnline];
+    [self.xmppRoom removeDelegate:self delegateQueue:dispatch_get_main_queue()];
     
     NSString *jabberID = [[NSUserDefaults standardUserDefaults] stringForKey:@"userID"];
     
@@ -177,20 +178,39 @@
                                             dispatchQueue:dispatch_get_main_queue()];
     [self.xmppRoom activate:self.xmppStream];
     [self.xmppRoom addDelegate:self delegateQueue:dispatch_get_main_queue()];
+ 
     [self.xmppRoom joinRoomUsingNickname:jabberID
                                  history:nil
                                 password:nil];
 }
 
 
+- (void)handleIncomingMessage:(XMPPMessage *)message room:(XMPPRoom *)room{
+
+     NSLog(@"Incomming message: %@", message.debugDescription);
+}
+
+
+
 -(void)xmppRoom:(XMPPRoom *)sender didReceiveMessage:(XMPPMessage *)message fromOccupant:(XMPPJID *)occupantJID {
     NSLog(@"SENDER:%@ MESSSAGE:%@",sender,message);
+     NSString *currentUserId = [[NSUserDefaults standardUserDefaults] stringForKey:@"userID"];
     
-    if([[message elementForName:@"body"]stringValue] != nil){ //&& userData){
+    NSString *from = [[message attributeForName:@"from"] stringValue];
+    from = [self getFromUser:from];
+    
+    NSString *error = [[message attributeForName:@"error"] stringValue];
+    
+    if([[message elementForName:@"body"]stringValue] != nil && ![from isEqualToString:currentUserId]  && !message.isErrorMessage){ //&& userData){
         
         NSString *msg = [[message elementForName:@"body"] stringValue];
-        NSString *from = [[message attributeForName:@"from"] stringValue];
+       
         NSString *to = [[message attributeForName:@"to"] stringValue];
+        to = [self getToUser:to];
+        NSLog(@"%@ %@",msg,from);
+        
+        NSString *roomId = [[message attributeForName:@"from"] stringValue];
+        roomId = [self getRoomId:roomId];
         NSLog(@"%@ %@",msg,from);
         
         NSDate*date=[NSString getCurrentDateFromString:[NSString getCurrentTime]];
@@ -204,6 +224,7 @@
         
         [m setObject:from forKey:@"sender"];
         [m setObject:to forKey:@"receiver"];
+        [m setObject:roomId forKey:@"roomId"];
         
         [__messageDelegate newMessageReceived:m];
         
@@ -211,21 +232,22 @@
         //Save Dialog History in Database
         
         DBManager *dataManager=[[DBManager alloc]initWithDB:DATABASE_NAME];
-        NSString* dialogId=[self getNickNameFromUserName:from];
+        //NSString* dialogId=[self getNickNameFromUserName:from];
         
-        NSString* queryCreationDate=[NSString stringWithFormat:@"select created_date from DIALOG_HISTORY where dialog_id=\"%@\"",dialogId];
+        NSString* queryCreationDate=[NSString stringWithFormat:@"select created_date from DIALOG_HISTORY where dialog_id=\"%@\"",roomId];
         NSString* creationDate=[dataManager getCreationDate:queryCreationDate];
         
-        NSString* queryUnread=[NSString stringWithFormat:@"select unread_count from DIALOG_HISTORY where dialog_id=\"%@\"",dialogId];
+        NSString* queryUnread=[NSString stringWithFormat:@"select unread_count from DIALOG_HISTORY where dialog_id=\"%@\"",roomId];
         int unread=[dataManager getUnreadCount:queryUnread];
         
         
         DialogHistory* dialogHistory=[[DialogHistory alloc]init];
-        dialogHistory.dialog_id=dialogId;
+        dialogHistory.dialog_id=roomId;
         dialogHistory.last_message=msg;
-        dialogHistory.last_username=dialogId;
+        dialogHistory.last_username=from;
         dialogHistory.last_message_date=time;
         dialogHistory.created_date=creationDate!=nil ? creationDate : time;
+        dialogHistory.chat_id=roomId;
         
         if ([self isCurrentView])
             dialogHistory.unread_count=0;
@@ -235,21 +257,66 @@
         [dataManager insertAndUpdateDialogHistoryWithArrayUsingTrasaction:@[dialogHistory]];
         
         //===========SAVING IN DATABASE =================//
+        
+       NSString *timeStamp = [[message elementForName:@"stamp"] stringValue];
+        
         ChatHistory *chat=[[ChatHistory alloc] init];
-        chat.chat_id=@"0";
+        chat.message_id=roomId;
+        chat.chat_id=roomId;
         chat.from_username=from;
         chat.to_username=to;
         chat.chat_message=msg;
-        chat.chat_timestamp=time;
+        chat.chat_timestamp=timeStamp;
         NSArray *ar=[[NSArray alloc]initWithObjects:chat, nil];
         DBManager *objDB=[[DBManager alloc]initWithDB:DATABASE_NAME];
         [objDB insertAndUpdateChatWithArrayUsingTrasaction:ar];
         
         
         //Update Chat View
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"OnIncomingMessageUpdateDialogHistory" object:nil userInfo:nil];
+       // [[NSNotificationCenter defaultCenter] postNotificationName:@"OnIncomingMessageUpdateDialogHistory" object:nil userInfo:nil];
     }
 }
+
+
+
+-(NSString*)getFromUser:(NSString*)resFromUser{
+
+  //  chatroom4@conference.localhost/infoiconuser6@localhost
+    NSString *strFromUser;
+    NSArray *array=[resFromUser componentsSeparatedByString:@"/"];
+    if (array.count>1){
+      
+        strFromUser=array[1];
+    }
+    return strFromUser;
+}
+
+-(NSString*)getToUser:(NSString*)resToUser{
+    
+    //  to="infoiconuser7@localhost/4531232569561642012142
+    NSString *strToUser;
+    NSArray *array=[resToUser componentsSeparatedByString:@"/"];
+    if (array.count>1){
+        
+        strToUser=array[0];
+    }
+    return strToUser;
+}
+
+-(NSString*)getRoomId:(NSString*)resToUser{
+    
+    //  to="infoiconuser7@localhost/4531232569561642012142
+    NSString *strRoomId;
+    NSArray *array=[resToUser componentsSeparatedByString:@"/"];
+    
+    if (array.count>0){
+        NSArray *array2=[array[0] componentsSeparatedByString:@"@"];
+        strRoomId = array2[0];
+    }
+    strRoomId = [strRoomId stringByAppendingString:@"@localhost"];
+   return strRoomId;
+}
+
 
 - (void)xmppRoom:(XMPPRoom *)sender occupantDidJoin:(XMPPJID *)occupantJID withPresence:(XMPPPresence *)presence {
     
@@ -261,9 +328,60 @@
 }
 - (void)xmppRoomDidJoin:(XMPPRoom *)sender{
     NSLog(@"ROOM JOINED");
-    // [sender fetchConfigurationForm];
+     [sender fetchConfigurationForm];
 }
 
+
+/**
+ * Necessary to prevent this message:
+ * "This room is locked from entry until configuration is confirmed."
+ */
+
+- (void)xmppRoom:(XMPPRoom *)sender didFetchConfigurationForm:(NSXMLElement *)configForm
+{
+    NSXMLElement *newConfig = [configForm copy];
+    NSArray *fields = [newConfig elementsForName:@"field"];
+    
+    for (NSXMLElement *field in fields)
+    {
+        
+        NSString *var = [field attributeStringValueForName:@"var"];
+        // Make Room Persistent
+        if ([var isEqualToString:@"muc#roomconfig_persistentroom"]) {
+            [field removeChildAtIndex:0];
+            [field addChild:[NSXMLElement elementWithName:@"value" stringValue:@"1"]];
+        }else if ([var isEqualToString:@"muc#roomconfig_roomname"]) {
+            [field removeChildAtIndex:0];
+            [field addChild:[NSXMLElement elementWithName:@"value" stringValue:@"GroupNameString"]];
+        }else if ([var isEqualToString:@"muc#roomconfig_publicroom"]) {
+            [field removeChildAtIndex:0];
+            [field addChild:[NSXMLElement elementWithName:@"value" stringValue:@"1"]];
+        }else if ([var isEqualToString:@"muc#roomconfig_whois"]) {
+            [field removeChildAtIndex:0];
+            [field addChild:[NSXMLElement elementWithName:@"value" stringValue:@"anyone"]];
+        }else if ([var isEqualToString:@"muc#roomconfig_allow_subscription"]) {
+            [field removeChildAtIndex:0];
+            [field addChild:[NSXMLElement elementWithName:@"value" stringValue:@"1"]];
+        }else if ([var isEqualToString:@"muc#roomconfig_membersonly"]) {
+            [field removeChildAtIndex:0];
+            [field addChild:[NSXMLElement elementWithName:@"value" stringValue:@"0"]];
+        }else if ([var isEqualToString:@"muc#roomconfig_moderatedroom"]) {
+            [field removeChildAtIndex:0];
+            [field addChild:[NSXMLElement elementWithName:@"value" stringValue:@"0"]];
+        }else if ([var isEqualToString:@"public_list"]) {
+            [field removeChildAtIndex:0];
+            [field addChild:[NSXMLElement elementWithName:@"value" stringValue:@"1"]];
+        }else if ([var isEqualToString:@"muc#roomconfig_allowinvites"]) {
+            [field removeChildAtIndex:0];
+            [field addChild:[NSXMLElement elementWithName:@"value" stringValue:@"1"]];
+        }else if ([var isEqualToString:@"muc#roomconfig_maxusers"]) {
+            [field removeChildAtIndex:0];
+            [field addChild:[NSXMLElement elementWithName:@"value" stringValue:@"10000"]];
+        }
+    }
+    
+    [sender configureRoomUsingOptions:newConfig];
+}
 
 
 // Other method

@@ -115,22 +115,6 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "XmppChatDemo/ChattingUI/ChatViewController.m"
-            timestampString = "517148288.689696"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "268"
-            endingLineNumber = "268"
-            landmarkName = "-loadMessageHistoryData"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "XmppChatDemo/MyViewControllers/DialogViewController.m"
             timestampString = "517137179.319087"
             startingColumnNumber = "9223372036854775807"
@@ -138,54 +122,6 @@
             startingLineNumber = "99"
             endingLineNumber = "99"
             landmarkName = "-tableView:didSelectRowAtIndexPath:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "XmppChatDemo/ChattingUI/ChatViewController.m"
-            timestampString = "517148288.689696"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "882"
-            endingLineNumber = "882"
-            landmarkName = "-newMessageReceived:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "XmppChatDemo/ChattingUI/ChatViewController.m"
-            timestampString = "517148288.689696"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "885"
-            endingLineNumber = "885"
-            landmarkName = "-newMessageReceived:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "XmppChatDemo/ChattingUI/ChatViewController.m"
-            timestampString = "517148288.689696"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "907"
-            endingLineNumber = "907"
-            landmarkName = "-newMessageReceived:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -260,12 +196,12 @@
                   moduleName = "XmppChatDemo"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///InfoiconProjects/Arvind_Project/Other/XmppGroupChat/XmppChatDemo/XmppChatDemo/AppDelegate.m"
-                  timestampString = "517149450.564457"
+                  timestampString = "517246144.185711"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "205"
                   endingLineNumber = "205"
-                  offsetFromSymbolStart = "745">
+                  offsetFromSymbolStart = "756">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
@@ -275,12 +211,12 @@
                   moduleName = "XmppChatDemo"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///InfoiconProjects/Arvind_Project/Other/XmppGroupChat/XmppChatDemo/XmppChatDemo/AppDelegate.m"
-                  timestampString = "517149450.566604"
+                  timestampString = "517246144.187847"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "205"
                   endingLineNumber = "205"
-                  offsetFromSymbolStart = "12">
+                  offsetFromSymbolStart = "32">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -340,11 +276,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "XmppChatDemo/AppDelegate.m"
-            timestampString = "517143501.270488"
+            timestampString = "517231756.298595"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "503"
-            endingLineNumber = "503"
+            startingLineNumber = "504"
+            endingLineNumber = "504"
             landmarkName = "-xmppRoom:didReceiveMessage:fromOccupant:"
             landmarkType = "7">
          </BreakpointContent>
@@ -377,8 +313,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "473"
             endingLineNumber = "473"
-            landmarkName = "-joinOrCreateRoom:"
-            landmarkType = "7">
+            landmarkName = "@implementation AppDelegate"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -388,11 +324,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "XmppChatDemo/AppDelegate.m"
-            timestampString = "517143501.270488"
+            timestampString = "517231756.298595"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "492"
-            endingLineNumber = "492"
+            startingLineNumber = "493"
+            endingLineNumber = "493"
             landmarkName = "-xmppRoomDidCreate:"
             landmarkType = "7">
          </BreakpointContent>
@@ -404,11 +340,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "XmppChatDemo/AppDelegate.m"
-            timestampString = "517143501.270488"
+            timestampString = "517231756.298595"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "495"
-            endingLineNumber = "495"
+            startingLineNumber = "496"
+            endingLineNumber = "496"
             landmarkName = "-xmppRoomDidJoin:"
             landmarkType = "7">
          </BreakpointContent>
@@ -425,8 +361,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "483"
             endingLineNumber = "483"
-            landmarkName = "-joinOrCreateRoom:"
-            landmarkType = "7">
+            landmarkName = "@implementation AppDelegate"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

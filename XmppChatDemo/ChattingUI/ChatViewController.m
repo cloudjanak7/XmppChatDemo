@@ -249,8 +249,8 @@
             
             if (_isGroupChat){
             
-                NSString *strUserId = [self getNickNameFromUserName:chatWithUser];
-                arrayMessageHistory=[db getGroupChatHistoryWithChatId:strUserId];
+                //NSString *strUserId = [self getNickNameFromUserName:chatWithUser];
+                arrayMessageHistory=[db getGroupChatHistoryWithChatId:chatWithUser];
             }else{
             
                 arrayMessageHistory=[db getChatHistoryData:TABLE_NAME_CHAT_HISTORY fromUser:userID toUser:chatWithUser];
@@ -880,21 +880,24 @@
         NSMutableDictionary* mc=[messageContent mutableCopy];
         
         NSString *sender = [mc objectForKey:@"sender"];
+    
+    if (_isGroupChat){
         
-        if([sender isEqualToString:chatWithUser]){
-                
-                NSDate*date=[NSString getCurrentDateFromString:[NSString getCurrentTime]];
-                NSString* time=[[Alert getDateFormatWithString:GET_FORMAT_TYPE] stringFromDate:date];
-                
-                NSString *message = [mc objectForKey:@"msg"];
-                [mc setObject:[message substituteEmoticons] forKey:@"msg"];
-                [mc setObject:time forKey:@"time"];
-
-                //===========ADDING AND LOADING RECEIVED MESSAGE =================//
-                [self addMessage:mc];
-                [self finishReceivingMessage];
-                [self scrollToBottomAnimated:YES];
-          
+        NSString *roomId = [mc objectForKey:@"roomId"];
+        if([roomId isEqualToString:chatWithUser]){
+            
+            NSDate*date=[NSString getCurrentDateFromString:[NSString getCurrentTime]];
+            NSString* time=[[Alert getDateFormatWithString:GET_FORMAT_TYPE] stringFromDate:date];
+            
+            NSString *message = [mc objectForKey:@"msg"];
+            [mc setObject:[message substituteEmoticons] forKey:@"msg"];
+            [mc setObject:time forKey:@"time"];
+            
+            //===========ADDING AND LOADING RECEIVED MESSAGE =================//
+            [self addMessage:mc];
+            [self finishReceivingMessage];
+            [self scrollToBottomAnimated:YES];
+            
         }
         else{
             
@@ -909,9 +912,43 @@
             }]];
             //[notificationBar addAction:[[GLNotifyAction alloc]initWithTitle:@"Cancel" style:4 handler:nil]];
             
-                //[[SoundEffect sharedSoundEffect] messageToneStart];
+            //[[SoundEffect sharedSoundEffect] messageToneStart];
         }
-}
+    }else{
+        if([sender isEqualToString:chatWithUser]){
+            
+            NSDate*date=[NSString getCurrentDateFromString:[NSString getCurrentTime]];
+            NSString* time=[[Alert getDateFormatWithString:GET_FORMAT_TYPE] stringFromDate:date];
+            
+            NSString *message = [mc objectForKey:@"msg"];
+            [mc setObject:[message substituteEmoticons] forKey:@"msg"];
+            [mc setObject:time forKey:@"time"];
+            
+            //===========ADDING AND LOADING RECEIVED MESSAGE =================//
+            [self addMessage:mc];
+            [self finishReceivingMessage];
+            [self scrollToBottomAnimated:YES];
+            
+        }
+        else{
+            
+            NSString *message = [mc objectForKey:@"msg"];
+            
+            NSString *strSender=[self getNickNameFromUserName:sender];
+            GLNotificationBar * notificationBar = [[GLNotificationBar alloc]initWithTitle:@"New Message received." message:[NSString stringWithFormat:@"%@ : %@",strSender,message] preferredStyle:0 handler:nil];
+            
+            [notificationBar addAction:[[GLNotifyAction alloc]initWithTitle:@"Like" style:0 handler:^(GLNotifyAction * action) {
+                NSLog(@"I Like this quote");
+                //NSLog(@"Text reply %@",action.textResponse);
+            }]];
+            //[notificationBar addAction:[[GLNotifyAction alloc]initWithTitle:@"Cancel" style:4 handler:nil]];
+            
+            //[[SoundEffect sharedSoundEffect] messageToneStart];
+        }
+     }
+     }
+
+
 
 #pragma mark - JSQMessagesViewController method overrides
 
@@ -942,12 +979,23 @@
                 if (_isGroupChat){
                     
                      NSString *jabberID = [[NSUserDefaults standardUserDefaults] stringForKey:@"userID"];
-                    NSString *strGroupName=[self getNickNameFromUserName:chatWithUser];
+                  //  NSString *strGroupName=[self getNickNameFromUserName:chatWithUser];
                     XMPPMessage *xMessage = [[XMPPMessage alloc] init];
-                    [xMessage addAttributeWithName:@"senderId" stringValue:jabberID];
-                    [xMessage addAttributeWithName:@"displayName" stringValue:jabberID];
+                   // [xMessage addAttributeWithName:@"senderId" stringValue:jabberID];
+                    
+                    // [message addAttributeWithName:@"from" stringValue:[self getFullRoomId]];
+                    
+                  //  [xMessage addAttributeWithName:@"displayName" stringValue:jabberID];
                     NSString *dateTimeInterval = [NSString stringWithFormat:@"%f",[[NSDate date] timeIntervalSince1970]];
-                    [xMessage addAttributeWithName:@"date" stringValue:dateTimeInterval];
+                    [xMessage addAttributeWithName:@"stamp" stringValue:dateTimeInterval];
+                    
+                  //  NSXMLElement *history = [NSXMLElement elementWithName:@"history"];
+                   // [history addAttributeWithName:@"since" stringValue:dateTimeInterval];
+                     //[NSDate dateWithTimeIntervalSince1970:1495549240.039486]
+                    
+                    NSXMLElement *threadElement = [NSXMLElement elementWithName:@"stamp" stringValue:dateTimeInterval];
+                    [xMessage addChild:threadElement];
+                    
                     
                     [xMessage addBody:messageStr];
                     
@@ -983,8 +1031,8 @@
                 ChatHistory *chat=[[ChatHistory alloc] init];
             
                 if (_isGroupChat){
-                    NSString *strGroupName = [self getNickNameFromUserName:chatWithUser];
-                     chat.chat_id=strGroupName;
+                    
+                     chat.chat_id=chatWithUser;
                 }else{
                     chat.chat_id=@"0";
                 }
@@ -992,6 +1040,7 @@
                     chat.to_username=chatWithUser;
                     chat.chat_message=messageStr;
                     chat.chat_timestamp=time;
+            
                     NSArray *ar=[[NSArray alloc]initWithObjects:chat, nil];
                     DBManager *objDB=[[DBManager alloc]initWithDB:DATABASE_NAME];
                     [objDB insertAndUpdateChatWithArrayUsingTrasaction:ar];
@@ -1011,6 +1060,18 @@
 
 }
 
+
+-(NSString*)getFullRoomId{
+
+     //chatroom4@conference.localhost/infoiconuser6@localhost
+    
+    NSString *strRoom = [self getNickNameFromUserName:chatWithUser];
+    
+    NSString *currentUserId = [[NSUserDefaults standardUserDefaults] stringForKey:@"userID"];
+    NSString *fullJID = [NSString stringWithFormat:@"%@@conference.localhost/%@",strRoom,currentUserId];
+    
+    return fullJID;
+}
 
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------

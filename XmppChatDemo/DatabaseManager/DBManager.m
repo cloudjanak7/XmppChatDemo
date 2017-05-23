@@ -115,7 +115,7 @@
     
     if(arr.count){
         const char *queryInsertAndUpdate =
-        "INSERT OR REPLACE INTO CHAT_HISTORY         (chat_id,from_username,to_username,chat_message,chat_timestamp)VALUES(?,?,?,?,?)";
+        "INSERT OR REPLACE INTO CHAT_HISTORY         (chat_id,from_username,to_username,chat_message,chat_timestamp,message_stamp)VALUES(?,?,?,?,?)";
         const char *queryDelete = "delete from CHAT_HISTORY where chat_id=?";
         sqlite3_stmt *compiledStatement1 = nil;
         sqlite3_stmt *compiledStatement2 = nil;
@@ -144,6 +144,8 @@
                     sqlite3_bind_text(compiledStatement1, 4, [chat.chat_message UTF8String], -1, SQLITE_STATIC);
                     
                     sqlite3_bind_text(compiledStatement1, 5, [chat.chat_timestamp UTF8String], -1, SQLITE_STATIC);
+                    
+                     sqlite3_bind_text(compiledStatement1, 6, [chat.message_stamp UTF8String], -1, SQLITE_STATIC);
                     
                     
                     if (sqlite3_step(compiledStatement1) != SQLITE_DONE)
@@ -178,7 +180,7 @@
     
     
     NSMutableArray *retval = [[NSMutableArray alloc] init]; //
-    NSString *query = [NSString stringWithFormat:@"SELECT id,chat_id,from_username,to_username,chat_message,chat_timestamp FROM %@",tableName];
+    NSString *query = [NSString stringWithFormat:@"SELECT message_id,chat_id,from_username,to_username,chat_message,chat_timestamp,message_stamp FROM %@",tableName];
     const char* queryUTF8 = [query UTF8String];
     sqlite3_stmt *statement;
     
@@ -191,10 +193,10 @@
                 
                 if ( sqlite3_column_type(statement, 0) != SQLITE_NULL ){
                     char *nameChars = (char *) sqlite3_column_text(statement, 0);
-                    jobs.database_id = [[NSString alloc] initWithUTF8String:nameChars];
+                    jobs.message_id = [[NSString alloc] initWithUTF8String:nameChars];
                 }
                 else
-                    jobs.database_id = @"NULL";
+                    jobs.message_id = @"NULL";
                 
                 if ( sqlite3_column_type(statement, 1) != SQLITE_NULL ){
                     char *nameChars = (char *) sqlite3_column_text(statement, 1);
@@ -230,6 +232,13 @@
                 }
                 else
                     jobs.chat_timestamp = @"NULL";
+                
+                if ( sqlite3_column_type(statement, 6) != SQLITE_NULL ){
+                    char *nameChars = (char *) sqlite3_column_text(statement, 6);
+                    jobs.message_stamp = [[NSString alloc] initWithUTF8String:nameChars];
+                }
+                else
+                    jobs.message_stamp = @"NULL";
                 
                 
                 [retval addObject:jobs];
@@ -245,7 +254,7 @@
     
     
     NSMutableArray *retval = [[NSMutableArray alloc] init]; //
-       NSString *query = [NSString stringWithFormat:@"SELECT id,chat_id,from_username,to_username,chat_message,chat_timestamp FROM CHAT_HISTORY WHERE chat_id = '%@'",chat_id];
+       NSString *query = [NSString stringWithFormat:@"SELECT message_id,chat_id,from_username,to_username,chat_message,chat_timestamp,message_stamp FROM CHAT_HISTORY WHERE chat_id = '%@'",chat_id];
     const char* queryUTF8 = [query UTF8String];
     sqlite3_stmt *statement;
     
@@ -258,10 +267,10 @@
                 
                 if ( sqlite3_column_type(statement, 0) != SQLITE_NULL ){
                     char *nameChars = (char *) sqlite3_column_text(statement, 0);
-                    jobs.database_id = [[NSString alloc] initWithUTF8String:nameChars];
+                    jobs.message_id = [[NSString alloc] initWithUTF8String:nameChars];
                 }
                 else
-                    jobs.database_id = @"NULL";
+                    jobs.message_id = @"NULL";
                 
                 if ( sqlite3_column_type(statement, 1) != SQLITE_NULL ){
                     char *nameChars = (char *) sqlite3_column_text(statement, 1);
@@ -297,6 +306,13 @@
                 }
                 else
                     jobs.chat_timestamp = @"NULL";
+                
+                if ( sqlite3_column_type(statement, 6) != SQLITE_NULL ){
+                    char *nameChars = (char *) sqlite3_column_text(statement, 6);
+                    jobs.message_stamp = [[NSString alloc] initWithUTF8String:nameChars];
+                }
+                else
+                    jobs.message_stamp = @"NULL";
                 
                 
                 [retval addObject:jobs];
@@ -311,7 +327,7 @@
 - (NSArray*)getChatHistoryData:(NSString*)tableName fromUser:(NSString*)fromUser toUser:(NSString*)toUser{
   
     NSMutableArray *retval = [[NSMutableArray alloc] init]; //
-    NSString *query = [NSString stringWithFormat:@"SELECT id,chat_id,from_username,to_username,chat_message,chat_timestamp FROM %@ WHERE (from_username = '%@' AND to_username = '%@') OR (from_username = '%@' AND to_username = '%@') ",tableName,fromUser,toUser,toUser,fromUser];
+    NSString *query = [NSString stringWithFormat:@"SELECT message_id,chat_id,from_username,to_username,chat_message,chat_timestamp,message_tsamp FROM %@ WHERE (from_username = '%@' AND to_username = '%@') OR (from_username = '%@' AND to_username = '%@') ",tableName,fromUser,toUser,toUser,fromUser];
     const char* queryUTF8 = [query UTF8String];
     sqlite3_stmt *statement;
     
@@ -324,10 +340,10 @@
                 
                 if ( sqlite3_column_type(statement, 0) != SQLITE_NULL ){
                     char *nameChars = (char *) sqlite3_column_text(statement, 0);
-                    jobs.database_id = [[NSString alloc] initWithUTF8String:nameChars];
+                    jobs.message_id = [[NSString alloc] initWithUTF8String:nameChars];
                 }
                 else
-                    jobs.database_id = @"NULL";
+                    jobs.message_id = @"NULL";
                 
                 if ( sqlite3_column_type(statement, 1) != SQLITE_NULL ){
                     char *nameChars = (char *) sqlite3_column_text(statement, 1);
@@ -363,6 +379,13 @@
                 }
                 else
                     jobs.chat_timestamp = @"NULL";
+                
+                if ( sqlite3_column_type(statement, 6) != SQLITE_NULL ){
+                    char *nameChars = (char *) sqlite3_column_text(statement, 6);
+                    jobs.message_stamp = [[NSString alloc] initWithUTF8String:nameChars];
+                }
+                else
+                    jobs.message_stamp = @"NULL";
                 
                 
                 [retval addObject:jobs];

@@ -30,8 +30,8 @@
    self.xmppManager = [XMPPManager sharedManager];
     //Native chat User
    
-    _txtUsername.text=@"infoiconuser5@localhost";
-    _txtPassword.text=@"infoiconuser5";
+    _txtUsername.text=@"infoiconuser6@localhost";
+    _txtPassword.text=@"infoiconuser6";
     
 }
 

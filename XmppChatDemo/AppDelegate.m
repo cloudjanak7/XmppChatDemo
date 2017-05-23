@@ -465,7 +465,7 @@
     return firstString;
     
 }
-
+/*
 
 #pragma mark Group chat
 #pragma mark Join or create new room
@@ -473,7 +473,7 @@
     NSString *jabberID = [[NSUserDefaults standardUserDefaults] stringForKey:@"userID"];
     
     XMPPRoomMemoryStorage *roomMemory = [[XMPPRoomMemoryStorage alloc]init];
-    //XMPPJID  *roomJID = [XMPPJID jidWithString:@"chat@conference.lasonic.local"];
+//    XMPPJID  *roomJID = [XMPPJID jidWithString:@"chat@conference.lasonic.local"];
     
     roomName=[roomName stringByAppendingString:@"@conference.localhost"];
     XMPPJID  *roomJID = [XMPPJID jidWithString:roomName];
@@ -486,6 +486,7 @@
                                  history:nil
                                 password:nil];
 }
+ */
 
 
 - (void)xmppRoomDidCreate:(XMPPRoom *)sender{
