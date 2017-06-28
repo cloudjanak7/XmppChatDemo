@@ -15,6 +15,7 @@
 #import "Alert.h"
 #import "Constant.h"
 #import "AppDelegate.h"
+#import "UsersViewController.h"
 @interface DialogViewController ()<UITableViewDelegate,UITableViewDataSource>
 {
     NSArray *arrayDialog;
@@ -35,7 +36,22 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self configNavigation];
+}
 
+-(void)configNavigation{
+
+    UIBarButtonItem *barButtonAddUser = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addUser)];
+                                         
+    self.navigationItem.rightBarButtonItem = barButtonAddUser;
+    
+}
+
+-(void)addUser{
+
+    UsersViewController *objVC = [self.storyboard instantiateViewControllerWithIdentifier:@"UsersViewController"];
+    [self.navigationController pushViewController:objVC animated:YES];
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated{

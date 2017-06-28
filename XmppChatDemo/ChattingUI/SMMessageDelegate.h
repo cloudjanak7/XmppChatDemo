@@ -12,6 +12,6 @@
 @protocol SMMessageDelegate
 
 - (void)newMessageReceived:(NSDictionary *)messageContent;
-- (void)newGroupMessageReceived:(NSDictionary *)messageContent;
+
 
 @end

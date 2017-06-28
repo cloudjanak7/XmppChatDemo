@@ -14,7 +14,6 @@
 #import "DialogViewController.h"
 #import "XMPPRoomMemoryStorage.h"
 #import "XMPPRoom.h"
-#import "GroupDialogViewController.h"
 
 @interface LoginViewController ()
 @property (weak, nonatomic) IBOutlet UITextField *txtUsername;
@@ -30,8 +29,8 @@
    self.xmppManager = [XMPPManager sharedManager];
     //Native chat User
    
-    _txtUsername.text=@"infoiconuser6@localhost";
-    _txtPassword.text=@"infoiconuser6";
+    _txtUsername.text=@"kollyde999@localhost";
+    _txtPassword.text=@"kollyde999";
     
 }
 
@@ -42,35 +41,13 @@
 }
 
 - (IBAction)btnLoginAction:(id)sender {
-    
-    
-    
+ 
     [self loginUserForChat];
-//      GroupDialogViewController* vc=[self.storyboard instantiateViewControllerWithIdentifier:@"GroupDialogViewController"];
-//    [self.navigationController pushViewController:vc animated:YES];
-    
     
     DialogViewController* vc=[self.storyboard instantiateViewControllerWithIdentifier:@"DialogViewController"];
     [self.navigationController pushViewController:vc animated:YES];
     
-//    NSString *toUserName;
-//    if ([_txtUsername.text isEqualToString:@"infoiconuser3@localhost"]){
-//        toUserName=@"infoiconuser2@localhost";
-//    }else{
-//       toUserName=@"infoiconuser3@localhost";
-//    }
-//    
-//    DBManager *dataManager = [[DBManager alloc]initWithDB:DATABASE_NAME];
-//    NSArray *arrayDialog = [dataManager GetDialogHistoryData];
-//    
-//    if(arrayDialog.count>0){
-//        DialogViewController* vc=[self.storyboard instantiateViewControllerWithIdentifier:@"DialogViewController"];
-//        [self.navigationController pushViewController:vc animated:YES];
-//        
-//    }else{
-//        ChatViewController* vc=[[ChatViewController alloc]initWithUser:toUserName];
-//        [self.navigationController pushViewController:vc animated:YES];
-//    }
+
 }
 
 #pragma mark- Chat Login

@@ -7,6 +7,7 @@
 //
 
 #import "UsersViewController.h"
+#import "ChatViewController.h"
 
 @interface UsersViewController ()
 {
@@ -19,7 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    arrayUsers=@[@"infoiconuser3@localhost",@"infoiconuser4@localhost"];
+    arrayUsers=@[@"kollyde999@localhost",@"kollyde1000@localhost",@"kollyde1001@localhost"];
 }
 
 #pragma mark:- Tableview delegate and datasource
@@ -41,7 +42,10 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
+    NSString *userId = arrayUsers[indexPath.row];
     
+    ChatViewController* vc=[[ChatViewController alloc]initWithUser:userId];
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 @end

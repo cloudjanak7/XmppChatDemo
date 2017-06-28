@@ -948,7 +948,7 @@
             //[[SoundEffect sharedSoundEffect] messageToneStart];
         }
      }
-     }
+}
 
 
 
@@ -1009,6 +1009,9 @@
                     [message addAttributeWithName:@"to" stringValue:chatWithUser];
                     [message addAttributeWithName:@"type" stringValue:@"chat"];
                     [message addChild:body];
+                    
+                    NSXMLElement *threadElement = [NSXMLElement elementWithName:@"stamp" stringValue:dateTimeInterval];
+                    [message addChild:threadElement];
                     
                     [[XMPPManager sharedManager].xmppStream sendElement:message];
 

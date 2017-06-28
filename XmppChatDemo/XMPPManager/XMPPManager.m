@@ -9,7 +9,7 @@
 #import "XMPPManager.h"
 #import "ChatViewController.h"
 #import "XMPPReconnect.h"
-#define kJABBER_HOSTNAME @"139.162.164.98"
+#define kJABBER_HOSTNAME @"45.79.169.14"//139.162.164.98"
 
 @interface XMPPManager ()
 @property (strong, nonatomic) XMPPReconnect *xmppReconnect;
@@ -31,10 +31,12 @@
 #pragma mark - Setup Stream and Connect to Server
 
 - (void)setupStream {
+    
     self.xmppStream = [[XMPPStream alloc] init];
     [self.xmppStream setHostName:kJABBER_HOSTNAME];
     [self.xmppStream setHostPort:5222];
     [self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    
 }
 
 - (BOOL)connect {
@@ -71,41 +73,12 @@
 
 
 
-//-(BOOL)connect {
-//    self.xmppStream = [[XMPPStream alloc] init];
-//    self.xmppStream.hostName = kJABBER_HOSTNAME;//@"lasonic.local";
-//    [self.xmppStream setHostPort:5222];
-//    [self.xmppStream addDelegate:self
-//                   delegateQueue:dispatch_get_main_queue()];
-//    
-//    if (![self.xmppStream isDisconnected]) {
-//        return YES;
-//    }
-//    
-//   //[self.xmppStream setMyJID:[XMPPJID jidWithString:@"chat@lasonic.local"]];
-//    NSString *jabberID = [[NSUserDefaults standardUserDefaults] stringForKey:@"userID"];
-//    
-//    [self.xmppStream setMyJID:[XMPPJID jidWithString:@"infoiconuser5@localhost"]];
-//    
-//    NSError *error;
-//    if (![self.xmppStream connectWithTimeout:10 error:&error]) {
-//        NSLog(@"Error: %@", [error localizedDescription]);
-//        return NO;
-//    }
-//    
-//    return YES;
-//    
-//}
-
 -(void)xmppStreamDidConnect:(XMPPStream *)sender {
     NSError *error;
     
     NSString *myPassword = [[NSUserDefaults standardUserDefaults] stringForKey:@"userPassword"];
     if(![[self xmppStream] authenticateWithPassword:myPassword error:&error])
         NSLog(@"Error authenticating: %@", error);
-//    if (![self.xmppStream authenticateAnonymously:&error]) {
-//         NSLog(@"Error: %@", [error localizedDescription]);
-//    }
 }
 
 - (void)xmppStreamDidAuthenticate:(XMPPStream *)sender {
@@ -158,6 +131,86 @@
     return NO;
 }
 
+#pragma mark :- Single Chat - Management
+- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message {
+    // message recived
+    
+    
+    NSLog(@"SENDER:%@ MESSSAGE:%@",sender,message);
+    
+    if([[message elementForName:@"body"]stringValue] != nil){ //&& userData){
+        
+        NSString *msg = [[message elementForName:@"body"] stringValue];
+        NSString *from = [[message attributeForName:@"from"] stringValue];
+        from = [self getToUser:from];
+        NSString *to = [[message attributeForName:@"to"] stringValue];
+        to = [self getToUser:to];
+        NSLog(@"%@ %@",msg,from);
+        
+     //   NSDate*date=[NSString getCurrentDateFromString:[NSString getCurrentTime]];
+      //  NSString* time=[[Alert getDateFormatWithString:GET_FORMAT_TYPE] stringFromDate:date];
+        
+        NSMutableDictionary *m = [[NSMutableDictionary alloc] init];
+        [m setObject:msg forKey:@"msg"];
+        
+        NSArray * arr = [from componentsSeparatedByString:@"/"];
+        from=arr.count>1 ? arr[0] : from;
+        
+        NSString *timeStamp = [[message elementForName:@"stamp"] stringValue];
+        NSTimeInterval _interval=[timeStamp doubleValue];
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:_interval];
+        NSString* time=[[Alert getDateFormatWithString:GET_FORMAT_TYPE] stringFromDate:date];
+        
+        //Save Dialog History in Database
+        
+        DBManager *dataManager=[[DBManager alloc]initWithDB:DATABASE_NAME];
+        NSString* dialogId=[self getNickNameFromUserName:from];
+        
+        NSString* queryCreationDate=[NSString stringWithFormat:@"select created_date from DIALOG_HISTORY where dialog_id=\"%@\"",dialogId];
+        NSString* creationDate=[dataManager getCreationDate:queryCreationDate];
+        
+        NSString* queryUnread=[NSString stringWithFormat:@"select unread_count from DIALOG_HISTORY where dialog_id=\"%@\"",dialogId];
+        int unread=[dataManager getUnreadCount:queryUnread];
+        
+        
+        DialogHistory* dialogHistory=[[DialogHistory alloc]init];
+        dialogHistory.dialog_id=dialogId;
+        dialogHistory.chat_id=@"0"; // In case group will be r
+        dialogHistory.last_message=msg;
+        dialogHistory.last_username=dialogId;
+        dialogHistory.last_message_date=time;
+        dialogHistory.created_date=creationDate!=nil ? creationDate : time;
+        
+        if ([self isCurrentView])
+            dialogHistory.unread_count=0;
+        else
+            dialogHistory.unread_count=unread+1;
+        //Insert Data into database
+        [dataManager insertAndUpdateDialogHistoryWithArrayUsingTrasaction:@[dialogHistory]];
+        
+        //===========SAVING IN DATABASE =================//
+     
+        
+        ChatHistory *chat=[[ChatHistory alloc] init];
+        chat.chat_id=@"0";
+        chat.from_username=from;
+        chat.to_username=to;
+        chat.chat_message=msg;
+        chat.chat_timestamp=time;
+        chat.message_stamp = timeStamp;
+        NSArray *ar=[[NSArray alloc]initWithObjects:chat, nil];
+        DBManager *objDB=[[DBManager alloc]initWithDB:DATABASE_NAME];
+        [objDB insertAndUpdateChatWithArrayUsingTrasaction:ar];
+        
+        
+        //Update Chat View
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"OnIncomingMessageUpdateDialogHistory" object:nil userInfo:nil];
+    }
+}
+
+
+
+#pragma mark :- GroupChat - Room Management
 
 -(void)joinOrCreateRoom:(NSString*)roomName {
     
@@ -225,10 +278,7 @@
         [m setObject:from forKey:@"sender"];
         [m setObject:to forKey:@"receiver"];
         [m setObject:roomId forKey:@"roomId"];
-        
-        //[__messageDelegate newMessageReceived:m];
-        
-        
+
         //Save Dialog History in Database
         
         DBManager *dataManager=[[DBManager alloc]initWithDB:DATABASE_NAME];

@@ -327,7 +327,7 @@
 - (NSArray*)getChatHistoryData:(NSString*)tableName fromUser:(NSString*)fromUser toUser:(NSString*)toUser{
   
     NSMutableArray *retval = [[NSMutableArray alloc] init]; //
-    NSString *query = [NSString stringWithFormat:@"SELECT message_id,chat_id,from_username,to_username,chat_message,chat_timestamp,message_tsamp FROM %@ WHERE (from_username = '%@' AND to_username = '%@') OR (from_username = '%@' AND to_username = '%@') ",tableName,fromUser,toUser,toUser,fromUser];
+    NSString *query = [NSString stringWithFormat:@"SELECT message_id,chat_id,from_username,to_username,chat_message,chat_timestamp,message_stamp FROM %@ WHERE (from_username = '%@' AND to_username = '%@') OR (from_username = '%@' AND to_username = '%@') ",tableName,fromUser,toUser,toUser,fromUser];
     const char* queryUTF8 = [query UTF8String];
     sqlite3_stmt *statement;
     
